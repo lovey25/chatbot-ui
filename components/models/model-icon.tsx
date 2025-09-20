@@ -101,6 +101,24 @@ export const ModelIcon: FC<ModelIconProps> = ({
           height={height}
         />
       )
+    case "lmstudio":
+      return (
+        <div
+          className={cn(
+            "flex items-center justify-center rounded-sm bg-[#2563eb] p-1 text-white",
+            theme === "dark"
+              ? "bg-[#2563eb]"
+              : "border-DEFAULT border-black bg-[#2563eb]"
+          )}
+        >
+          <span
+            className="text-xs font-bold"
+            style={{ fontSize: `${width * 0.4}px` }}
+          >
+            LM
+          </span>
+        </div>
+      )
     default:
       return <IconSparkles size={width} />
   }

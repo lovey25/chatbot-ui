@@ -307,7 +307,10 @@ export const useChatHandler = () => {
           setToolInUse
         )
       } else {
-        if (modelData!.provider === "ollama") {
+        if (
+          modelData!.provider === "ollama" ||
+          modelData!.provider === "lmstudio"
+        ) {
           generatedText = await handleLocalChat(
             payload,
             profile!,
@@ -318,7 +321,8 @@ export const useChatHandler = () => {
             setIsGenerating,
             setFirstTokenReceived,
             setChatMessages,
-            setToolInUse
+            setToolInUse,
+            modelData!.provider
           )
         } else {
           generatedText = await handleHostedChat(

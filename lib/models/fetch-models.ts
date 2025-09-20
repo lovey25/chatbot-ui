@@ -111,3 +111,31 @@ export const fetchOpenRouterModels = async () => {
     toast.error("Error fetching Open Router models: " + error)
   }
 }
+
+export const fetchLMStudioModels = async (
+  lmstudioUrl: string
+): Promise<LLM[] | undefined> => {
+  try {
+    const response = await fetch(`${lmstudioUrl}/v1/models`)
+
+    if (!response.ok) {
+      throw new Error(`LM Studio server is not responding.`)
+    }
+
+    const data = await response.json()
+
+    const localModels: LLM[] = data.data.map((model: any) => ({
+      modelId: model.id as LLMID,
+      modelName: model.id,
+      provider: "lmstudio",
+      hostedId: model.id,
+      platformLink: "https://lmstudio.ai",
+      imageInput: false
+    }))
+
+    return localModels
+  } catch (error) {
+    console.warn("Error fetching LM Studio models: " + error)
+    return undefined
+  }
+}

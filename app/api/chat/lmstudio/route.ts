@@ -17,22 +17,27 @@ export async function POST(request: Request) {
   try {
     const profile = await getServerProfile()
 
-    // LM Studio doesn't require API key but we check for base URL
-    if (!profile.lmstudio_url) {
-      throw new Error("LM Studio URL not configured")
+    // LM Studio URL 확인 (프로필 또는 환경변수에서)
+    const lmstudioUrl =
+      profile.lmstudio_url || process.env.NEXT_PUBLIC_LM_STUDIO_URL
+
+    if (!lmstudioUrl) {
+      throw new Error(
+        "LM Studio URL not configured in profile or environment variables"
+      )
     }
 
-    // Create OpenAI client pointing to LM Studio server
+    // OpenAI 호환 클라이언트 사용 (더 안정적)
     const openai = new OpenAI({
       apiKey: "lm-studio", // LM Studio doesn't require a real API key
-      baseURL: profile.lmstudio_url + "/v1"
+      baseURL: lmstudioUrl + "/v1"
     })
 
     const response = await openai.chat.completions.create({
       model: chatSettings.model as ChatCompletionCreateParamsBase["model"],
       messages: messages as ChatCompletionCreateParamsBase["messages"],
       temperature: chatSettings.temperature,
-      max_tokens: chatSettings.maxTokens || 4096,
+      max_tokens: chatSettings.contextLength || 4096,
       stream: true
     })
 
@@ -46,8 +51,10 @@ export async function POST(request: Request) {
     if (errorMessage.toLowerCase().includes("lm studio url")) {
       errorMessage =
         "LM Studio URL not configured. Please set it in your profile settings."
-    } else if (errorMessage.toLowerCase().includes("econnrefused") || 
-               errorMessage.toLowerCase().includes("fetch failed")) {
+    } else if (
+      errorMessage.toLowerCase().includes("econnrefused") ||
+      errorMessage.toLowerCase().includes("fetch failed")
+    ) {
       errorMessage =
         "Cannot connect to LM Studio. Please ensure LM Studio is running and the server is started."
     }

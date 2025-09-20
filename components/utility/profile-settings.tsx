@@ -118,9 +118,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
     profile?.openrouter_api_key || ""
   )
 
-  const [lmstudioUrl, setLmstudioUrl] = useState(
-    profile?.lmstudio_url || ""
-  )
+  const [lmstudioUrl, setLmstudioUrl] = useState(profile?.lmstudio_url || "")
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
@@ -177,7 +175,8 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
       "mistral",
       "groq",
       "perplexity",
-      "openrouter"
+      "openrouter",
+      "lmstudio"
     ]
 
     providers.forEach(async provider => {
@@ -187,6 +186,8 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
         providerKey = "google_gemini_api_key"
       } else if (provider === "azure") {
         providerKey = "azure_openai_api_key"
+      } else if (provider === "lmstudio") {
+        providerKey = "lmstudio_url"
       } else {
         providerKey = `${provider}_api_key` as keyof typeof profile
       }

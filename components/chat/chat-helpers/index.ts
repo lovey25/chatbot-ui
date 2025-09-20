@@ -154,21 +154,36 @@ export const handleLocalChat = async (
   setIsGenerating: React.Dispatch<React.SetStateAction<boolean>>,
   setFirstTokenReceived: React.Dispatch<React.SetStateAction<boolean>>,
   setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
-  setToolInUse: React.Dispatch<React.SetStateAction<string>>
+  setToolInUse: React.Dispatch<React.SetStateAction<string>>,
+  provider: string,
+  lmstudioUrl?: string
 ) => {
   const formattedMessages = await buildFinalMessages(payload, profile, [])
 
-  // Ollama API: https://github.com/jmorganca/ollama/blob/main/docs/api.md
-  const response = await fetchChatResponse(
-    process.env.NEXT_PUBLIC_OLLAMA_URL + "/api/chat",
-    {
+  let apiUrl = ""
+  let requestBody: any = {}
+  if (provider === "lmstudio") {
+    // API 라우트를 통해 LM Studio 요청 (임시로 스트리밍 비활성화)
+    apiUrl = "/api/chat/lmstudio"
+    requestBody = {
+      chatSettings: chatSettings,
+      messages: formattedMessages
+    }
+  } else {
+    apiUrl = process.env.NEXT_PUBLIC_OLLAMA_URL + "/api/chat"
+    requestBody = {
       model: chatSettings.model,
       messages: formattedMessages,
       options: {
         temperature: payload.chatSettings.temperature
       }
-    },
-    false,
+    }
+  }
+
+  const response = await fetchChatResponse(
+    apiUrl,
+    requestBody,
+    provider === "lmstudio", // LM Studio는 OpenAI 호환이므로 true
     newAbortController,
     setIsGenerating,
     setChatMessages
@@ -179,7 +194,7 @@ export const handleLocalChat = async (
     isRegeneration
       ? payload.chatMessages[payload.chatMessages.length - 1]
       : tempAssistantMessage,
-    false,
+    provider === "lmstudio", // LM Studio는 OpenAI 호환이므로 true
     newAbortController,
     setFirstTokenReceived,
     setChatMessages,
@@ -208,9 +223,12 @@ export const handleHostedChat = async (
 
   let draftMessages = await buildFinalMessages(payload, profile, chatImages)
 
-  let formattedMessages : any[] = []
+  let formattedMessages: any[] = []
   if (provider === "google") {
-    formattedMessages = await adaptMessagesForGoogleGemini(payload, draftMessages)
+    formattedMessages = await adaptMessagesForGoogleGemini(
+      payload,
+      draftMessages
+    )
   } else {
     formattedMessages = draftMessages
   }
@@ -291,6 +309,7 @@ export const processResponse = async (
   let contentToAdd = ""
 
   if (response.body) {
+    // 스트리밍 응답 처리
     await consumeReadableStream(
       response.body,
       chunk => {
@@ -336,11 +355,39 @@ export const processResponse = async (
       },
       controller.signal
     )
-
-    return fullText
   } else {
-    throw new Error("Response body is null")
+    // 비스트리밍 응답 처리 (LM Studio 임시)
+    try {
+      const data = await response.json()
+      if (data.content) {
+        setFirstTokenReceived(true)
+        setToolInUse("none")
+        fullText = data.content
+
+        setChatMessages(prev =>
+          prev.map(chatMessage => {
+            if (chatMessage.message.id === lastChatMessage.message.id) {
+              const updatedChatMessage: ChatMessage = {
+                message: {
+                  ...chatMessage.message,
+                  content: fullText
+                },
+                fileItems: chatMessage.fileItems
+              }
+
+              return updatedChatMessage
+            }
+
+            return chatMessage
+          })
+        )
+      }
+    } catch (error) {
+      console.error("Error parsing non-streaming response:", error)
+    }
   }
+
+  return fullText
 }
 
 export const handleCreateChat = async (

@@ -13,7 +13,7 @@ export const LMSTUDIO_LLM_LIST: LLM[] = [
     imageInput: false
   },
   {
-    modelId: "llama-3-70b-instruct", 
+    modelId: "llama-3-70b-instruct",
     modelName: "Llama 3 70B Instruct",
     provider: "lmstudio",
     hostedId: "llama-3-70b-instruct",
@@ -24,7 +24,7 @@ export const LMSTUDIO_LLM_LIST: LLM[] = [
     modelId: "codellama-13b-instruct",
     modelName: "Code Llama 13B Instruct",
     provider: "lmstudio",
-    hostedId: "codellama-13b-instruct", 
+    hostedId: "codellama-13b-instruct",
     platformLink: LM_STUDIO_PLATFORM_LINK,
     imageInput: false
   },
@@ -47,7 +47,7 @@ export const LMSTUDIO_LLM_LIST: LLM[] = [
   {
     modelId: "lmstudio-custom",
     modelName: "Custom Model (LM Studio)",
-    provider: "lmstudio", 
+    provider: "lmstudio",
     hostedId: "custom",
     platformLink: LM_STUDIO_PLATFORM_LINK,
     imageInput: false

@@ -10,7 +10,8 @@ import { convertBlobToBase64 } from "@/lib/blob-to-b64"
 import {
   fetchHostedModels,
   fetchOllamaModels,
-  fetchOpenRouterModels
+  fetchOpenRouterModels,
+  fetchLMStudioModels
 } from "@/lib/models/fetch-models"
 import { supabase } from "@/lib/supabase/browser-client"
 import { Tables } from "@/supabase/types"
@@ -146,8 +147,17 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
 
       if (process.env.NEXT_PUBLIC_OLLAMA_URL) {
         const localModels = await fetchOllamaModels()
-        if (!localModels) return
-        setAvailableLocalModels(localModels)
+        if (localModels) setAvailableLocalModels(localModels)
+      }
+
+      // Fetch LM Studio models if URL is configured
+      const lmstudioUrl =
+        profile?.lmstudio_url || process.env.NEXT_PUBLIC_LM_STUDIO_URL
+      if (lmstudioUrl) {
+        const lmstudioModels = await fetchLMStudioModels(lmstudioUrl)
+        if (lmstudioModels) {
+          setAvailableLocalModels(prev => [...prev, ...lmstudioModels])
+        }
       }
     })()
   }, [])

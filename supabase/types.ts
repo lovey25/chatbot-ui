@@ -1119,6 +1119,7 @@ export type Database = {
           id: string
           image_path: string
           image_url: string
+          lmstudio_url: string | null
           mistral_api_key: string | null
           openai_api_key: string | null
           openai_organization_id: string | null
@@ -1147,6 +1148,7 @@ export type Database = {
           id?: string
           image_path: string
           image_url: string
+          lmstudio_url?: string | null
           mistral_api_key?: string | null
           openai_api_key?: string | null
           openai_organization_id?: string | null
@@ -1175,6 +1177,7 @@ export type Database = {
           id?: string
           image_path?: string
           image_url?: string
+          lmstudio_url?: string | null
           mistral_api_key?: string | null
           openai_api_key?: string | null
           openai_organization_id?: string | null

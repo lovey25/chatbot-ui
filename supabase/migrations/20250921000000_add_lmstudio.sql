@@ -1,0 +1,1 @@
+ALTER TABLE profiles ADD COLUMN lmstudio_url TEXT CHECK (char_length(lmstudio_url) <= 1000);

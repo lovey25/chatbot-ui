@@ -7,6 +7,7 @@ export type LLMID =
   | MistralLLMID
   | GroqLLMID
   | PerplexityLLMID
+  | LMStudioLLMID
 
 // OpenAI Models (UPDATED 5/13/24)
 export type OpenAILLMID =
@@ -60,6 +61,9 @@ export type PerplexityLLMID =
   | "sonar-small-online" // Sonar Small Online
   | "sonar-medium-chat" // Sonar Medium Chat
   | "sonar-medium-online" // Sonar Medium Online
+
+// LM Studio Models (Local models served by LM Studio)
+export type LMStudioLLMID = string // Dynamic model IDs from LM Studio
 
 export interface LLM {
   modelId: LLMID

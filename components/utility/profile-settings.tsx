@@ -118,6 +118,10 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
     profile?.openrouter_api_key || ""
   )
 
+  const [lmstudioUrl, setLmstudioUrl] = useState(
+    profile?.lmstudio_url || ""
+  )
+
   const handleSignOut = async () => {
     await supabase.auth.signOut()
     router.push("/login")
@@ -157,7 +161,8 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
       azure_openai_45_turbo_id: azureOpenai45TurboID,
       azure_openai_45_vision_id: azureOpenai45VisionID,
       azure_openai_embeddings_id: azureEmbeddingsID,
-      openrouter_api_key: openrouterAPIKey
+      openrouter_api_key: openrouterAPIKey,
+      lmstudio_url: lmstudioUrl
     })
 
     setProfile(updatedProfile)
@@ -719,6 +724,22 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                       type="password"
                       value={openrouterAPIKey}
                       onChange={e => setOpenrouterAPIKey(e.target.value)}
+                    />
+                  </>
+                )}
+              </div>
+
+              <div className="space-y-1">
+                {envKeyMap["lmstudio"] ? (
+                  <Label>LM Studio URL set by admin.</Label>
+                ) : (
+                  <>
+                    <Label>LM Studio URL</Label>
+                    <Input
+                      placeholder="http://localhost:1234"
+                      type="text"
+                      value={lmstudioUrl}
+                      onChange={e => setLmstudioUrl(e.target.value)}
                     />
                   </>
                 )}
